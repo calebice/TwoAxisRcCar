@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="submit">OK</string>
+    <string name="default_url">192.168.1.15</string>
+    <string name="default_port">5432</string>
+    <string name="app_name">RC Surveillance</string>
+    <string name="textSurv">Surveil</string>
+    <string name="textSport">Sport</string>
+    <string name="textQuit">Quit</string>
+    <string name="defaultX">X:######</string>
+    <string name="defaultY">Y:######</string>
+    <string name="defaultZ">Z:######</string>
+    <string name="defaultDrive">D: STOP</string>
+    <string name="forward">FWD</string>
+    <string name="reverse">REV</string>
+    <string name="textConnect">Connect</string>
+    <string name="defaultIp">192.168.1.15</string>
+    <string name="homeIP_jesse">192.168.0.30</string>
+    <string name="textPort">5432</string>
+    <string name="title_activity_main">MainActivity</string>
+</resources>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ui_layout"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <com.google.vrtoolkit.cardboard.CardboardView
+        android:id="@+id/cardboard_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true" />
+
+    <calebice.twoaxisrccar.OverlayView
+        android:id="@+id/overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" >
+    </calebice.twoaxisrccar.OverlayView>
+
+    <LinearLayout
+        android:layout_alignLeft="@+id/overlay"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+        <Button
+            android:text="@string/textQuit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/quitButton"
+            android:width="210px"
+            android:layout_x="235dp"
+            android:layout_y="392dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_row="0"
+            android:layout_column="13"
+            android:layout_weight="1" />
+
+        <TextView
+            android:text="@string/defaultX"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_y"
+            android:layout_weight="1" />
+
+        <TextView
+            android:text="@string/defaultY"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_x"
+            android:layout_weight="1" />
+
+        <TextView
+            android:text="@string/defaultZ"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_z"
+            android:layout_weight="1" />
+
+        <TextView
+            android:text="@string/defaultDrive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_d"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/rightLayout"
+        android:orientation="vertical"
+        android:layout_height="match_parent"
+        android:layout_width="120dp"
+        android:layout_alignParentEnd="true">
+
+        <Button
+            android:id="@+id/fwdbuttonID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/forward"
+            android:layout_alignParentTop="true"/>
+
+        <Button
+            android:id="@+id/revbuttonID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/reverse"
+            android:layout_below="@id/fwdbuttonID" />
+
+        <Switch
+            android:id="@+id/modeSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/textSport"
+            android:textOn="@string/textSurv"
+            android:textOff="@string/textSport"
+            android:layout_alignParentBottom="true" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
