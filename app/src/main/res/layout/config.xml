@@ -7,7 +7,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
+        android:id="@+id/ipTextID"
         android:layout_gravity="center_horizontal"
         android:text="@string/defaultIp" />
 
@@ -17,12 +17,12 @@
         android:inputType="textPersonName"
         android:text="@string/default_port"
         android:ems="10"
-        android:id="@+id/editText2" />
+        android:id="@+id/portTextID" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button"
+        android:id="@+id/connectButton"
         android:layout_gravity="center_horizontal"
         android:text="@string/submit" />
 </LinearLayout>

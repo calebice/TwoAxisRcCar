@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/** Authors: Caleb Ice, Jesse Reyes, Justin Janker*/
+
 package calebice.twoaxisrccar.GuiFunctions;
 
 import android.app.Activity;
@@ -54,9 +56,9 @@ import calebice.twoaxisrccar.mjpeg.MjpegPlayer;
  * A Cardboard application that streams video from an online address and port
  * Builds on top of a CardboardView
  */
-public class StreamActivity extends Activity implements CardboardView.StereoRenderer {
+public class StreamControllerActivity extends Activity implements CardboardView.StereoRenderer {
 
-    private static final String TAG = "StreamActivity";
+    private static final String TAG = "StreamControllerActivity";
 
     final Context me = this;
     private OverlayView mOverlayView;
@@ -66,7 +68,10 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
     private String ip="";
     private int port= 0;
 
-    public StreamActivity() {
+    /**
+     * Constructor for StreamControllerActivity
+     */
+    public StreamControllerActivity() {
     }
 
     /**
@@ -83,6 +88,7 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
         cardboardView.setRenderer(this);
 
         Intent i = getIntent();
+        /*Sets Ip and port number to connect to Video stream/Raspberry Pi Server*/
         ip += i.getExtras().get("ip");
         port = Integer.parseInt(i.getExtras().get("port").toString());
         baseUrl += ip;
@@ -97,19 +103,19 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
 
 
     /**
-     * Sets up the MjpegPlayer using the OverlayView
-     * Attaches the :5000/stream/video.mjpeg in order to get valid stream
-     * Creates a DoRead oject which creates a thread to render the Mjpeg stream
+     * Sets up the MjpegPlayer using the OverlayView object
+     * Attaches the :5000/stream/video.mjpeg in order to get stay consistent with UV4L WebRTC format
+     * Creates a ReadInputStream object which creates a thread to render the Mjpeg stream
      */
     private void startPlayer(){
         String URL = baseUrl + ":5000/stream/video.mjpeg";
         mp = new MjpegPlayer(mOverlayView);
-        (new DoRead()).execute(URL);
+        (new ReadInputStream()).execute(URL);
     }
 
-    /*Required methods in order to use the Google API renderer */
-    /*None of these are required for video streaming, required implementations of abstracts*/
-    /*Used for implementing CardboardView.StereoRenderer*/
+    /*Required methods in order to use the Google API renderer
+    None of these are required for video streaming, required implementations of abstracts
+    Used for implementing CardboardView.StereoRenderer*/
     @Override
     public void onRendererShutdown(){Log.i(TAG, "onRendererShutdown");}
     @Override
@@ -124,7 +130,11 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
     public void onFinishFrame(Viewport viewport) {}
     /*End non-used method implementations*/
 
-    class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
+    /**
+     * Checks for valid input MJpeg stream at a specified URL location, sets MjpegPlayer source if
+     * found, returns to ConnectActivity if no stream is available.
+     */
+    class ReadInputStream extends AsyncTask<String, Void, MjpegInputStream> {
 
         @Override
         protected MjpegInputStream doInBackground(String... params) {
@@ -134,10 +144,9 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
         protected void onPostExecute(MjpegInputStream result) {
             if (result == null){
                 Toast.makeText(me,ip+" has no valid stream",Toast.LENGTH_LONG).show();
-                startActivity(new Intent(me,ConfigActivity.class));
+                startActivity(new Intent(me,ConnectActivity.class));
             }
             mp.setSource(result);
-            Log.i(TAG, "running mjpeg input stream");
         }
     }
 
@@ -161,8 +170,6 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
          * Sets up the textfields, the sensor listener, quit button and the modeSwitch
          */
         public void run() {
-
-            //Toast.makeText(MainActivity.this, "Starting Program...", Toast.LENGTH_SHORT).show();
 
             final Intent i = getIntent();
             //TextView Setup for X, Y, Z
@@ -251,21 +258,22 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
                     closeProgram = true;
 
                     finishActivity(0);
-                    Intent ReturnToSignin = new Intent(StreamActivity.this, ConfigActivity.class);
+                    Intent ReturnToSignin = new Intent(StreamControllerActivity.this, ConnectActivity.class);
                     System.exit(0);
                     startActivity(ReturnToSignin);
                 }
             });
-
-
         }
 
+        /**
+         * Unneeded for this application
+         */
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {}
 
         /**
          * Listens for changes in the different axis accelerometer ranges and upon a change
-         * puts together a message and writes it out to the server using a UDP_Client object
+         * puts together a message and writes it out to the server using an UDP_Client object
          * @param event Instance of a accelerometer value change
          */
         @Override
