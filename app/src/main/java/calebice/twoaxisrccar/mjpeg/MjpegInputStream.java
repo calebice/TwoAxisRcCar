@@ -20,6 +20,11 @@ public class MjpegInputStream extends DataInputStream {
     private final static int FRAME_MAX_LENGTH = 40000 + HEADER_MAX_LENGTH;
     private int mContentLength = -1;
 
+    /**
+     * attempts to connect to a URL and returns the available stream
+     * @param urlString the url to connect to
+     * @return the Stream of MJpegs at a url
+     */
     public static MjpegInputStream read(String urlString) {
         HttpURLConnection conn;
         try {

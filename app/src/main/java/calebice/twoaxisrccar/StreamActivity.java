@@ -17,6 +17,7 @@
 package calebice.twoaxisrccar;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -31,6 +32,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.vrtoolkit.cardboard.CardboardView;
 import com.google.vrtoolkit.cardboard.EyeTransform;
@@ -47,17 +49,20 @@ import calebice.twoaxisrccar.mjpeg.MjpegInputStream;
 import calebice.twoaxisrccar.mjpeg.MjpegPlayer;
 
 /**
- * A Cardboard application that streams video from a RPi
+ * A Cardboard application that streams video from an online address and port
+ * Builds on top of a CardboardView
  */
 public class StreamActivity extends Activity implements CardboardView.StereoRenderer {
 
     private static final String TAG = "StreamActivity";
 
+    final Context me = this;
     private OverlayView mOverlayView;
     private MjpegPlayer mp;
     private String baseUrl = "http://";
     private ClientThread CT;
-    String ip="";
+    private String ip="";
+    private String port="";
 
     public StreamActivity() {
     }
@@ -77,6 +82,7 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
 
         Intent i = getIntent();
         ip += i.getExtras().get("ip");
+        port += i.getExtras().get("port");
         baseUrl += ip;
 
         CT = new ClientThread();
@@ -85,41 +91,36 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
         CT.run();
 
         startPlayer();
-
     }
 
 
     /**
      * Sets up the MjpegPlayer using the OverlayView
+     * Attaches the :5000/stream/video.mjpeg in order to get valid stream
+     * Creates a DoRead oject which creates a thread to render the Mjpeg stream
      */
     private void startPlayer(){
         String URL = baseUrl + ":5000/stream/video.mjpeg";
         mp = new MjpegPlayer(mOverlayView);
         (new DoRead()).execute(URL);
-        /*Maybe put a ThreadManager here*/
     }
 
     /*Required methods in order to use the Google API renderer */
+    /*None of these are required for video streaming, required implementations of abstracts*/
+    /*Used for implementing CardboardView.StereoRenderer*/
     @Override
-    public void onRendererShutdown(){
-        Log.i(TAG, "onRendererShutdown");}
+    public void onRendererShutdown(){Log.i(TAG, "onRendererShutdown");}
     @Override
-    public void onSurfaceChanged(int width, int height) {
-        Log.i(TAG, "onSurfaceChanged");
-    }
+    public void onSurfaceChanged(int width, int height) {Log.i(TAG, "onSurfaceChanged");}
     @Override
-    public void onSurfaceCreated(EGLConfig config) {
-        Log.i(TAG, "onSurfaceCreated");
-    }
+    public void onSurfaceCreated(EGLConfig config) {Log.i(TAG, "onSurfaceCreated");}
     @Override
-    public void onNewFrame(HeadTransform headTransform) {
-    }
+    public void onNewFrame(HeadTransform headTransform) {}
     @Override
-    public void onDrawEye(EyeTransform transform) {
-    }
+    public void onDrawEye(EyeTransform transform) {}
     @Override
-    public void onFinishFrame(Viewport viewport) {
-    }
+    public void onFinishFrame(Viewport viewport) {}
+    /*End non-used method implementations*/
 
     class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
 
@@ -130,7 +131,9 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
 
         protected void onPostExecute(MjpegInputStream result) {
             if (result == null){
-                throw new RuntimeException("stream is null!!!");
+                Toast.makeText(me,ip+" has no valid stream",Toast.LENGTH_LONG).show();
+
+                startActivity(new Intent(me,ConfigActivity.class));
             }
             mp.setSource(result);
             Log.i(TAG, "running mjpeg input stream");
@@ -141,7 +144,7 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
      * Helper class that accesses Android accelerometer values and then prepares and sends
      * a message to the Raspberry Pi server listener program
      */
-    class ClientThread implements SensorEventListener {
+    private class ClientThread implements SensorEventListener {
         boolean closeProgram = false;
         messageProcessor servoMsg = new messageProcessor();
         Sensor accelerometer;
@@ -156,7 +159,6 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
         /**
          * Sets up the textfields, the sensor listener, quit button and the modeSwitch
          */
-        // @Override
         public void run() {
 
             //Toast.makeText(MainActivity.this, "Starting Program...", Toast.LENGTH_SHORT).show();
@@ -277,7 +279,7 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
                 HashMap<String, Object> params = new HashMap<>();
                 params.put("ip", ip);
                 params.put("msg", servoMsg.getFormatMessage());
-                params.put("port", 5432);
+                params.put("port", port);
                 if(!closeProgram) {
                     try {
                         new UDP_Client().execute(params);

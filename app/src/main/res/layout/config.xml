@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/editText"
         android:layout_gravity="center_horizontal"
-        android:text="@string/homeIP_jesse" />
+        android:text="@string/defaultIp" />
 
     <EditText
         android:layout_width="match_parent"

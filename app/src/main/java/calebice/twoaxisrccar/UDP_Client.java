@@ -27,7 +27,6 @@ class UDP_Client extends AsyncTask<HashMap, Integer, String> {
     DatagramSocket clientSocket;
     DatagramPacket sendPacket;
     byte[] sendData, receiveData;
-    //BufferedReader inFromUser;
 
     //Constructors
     public UDP_Client() throws IOException {    }
