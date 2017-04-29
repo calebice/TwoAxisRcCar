@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-
+/**
+ * Extension of LinearLayout that sets up the frame to view the incoming video
+ */
 public class OverlayView extends LinearLayout {
     private final OverlayFrameView mView;
 
@@ -38,12 +40,17 @@ public class OverlayView extends LinearLayout {
     }
 
     /**
-     * This is a helper class for OverlayView.
+     * This is a helper class for OverlayView. Creates a SurfaceView object which draws
+     * incoming images. This is passed into MjpegPlayer as the object to draw on
      */
     private class OverlayFrameView extends ViewGroup {
         private final SurfaceView imageView;
-        private float offset;
 
+        /**
+         * Constructor that
+         * @param context
+         * @param attrs
+         */
         public OverlayFrameView(Context context, AttributeSet attrs) {
             super(context, attrs);
             imageView = new SurfaceView(context, attrs);
@@ -68,7 +75,7 @@ public class OverlayView extends LinearLayout {
 
             // Layout ImageView
             float imageMargin = (1.0f - imageSize) / 2.0f;
-            float leftMargin = (int) (width * (imageMargin + offset));
+            float leftMargin = (int) (width * (imageMargin));
             float topMargin = (int) (height * (imageMargin + verticalImageOffset));
             imageView.layout(
                     (int) leftMargin, (int) topMargin,

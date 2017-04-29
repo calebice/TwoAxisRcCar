@@ -54,7 +54,8 @@ import calebice.twoaxisrccar.mjpeg.MjpegPlayer;
 
 /**
  * A Cardboard application that streams video from an online address and port
- * Builds on top of a CardboardView
+ * Builds on top of a CardboardView Renderer to process images, as well as creates
+ * a ClientThread to send messages to a Raspberry Pi Server
  */
 public class StreamControllerActivity extends Activity implements CardboardView.StereoRenderer {
 
@@ -71,8 +72,7 @@ public class StreamControllerActivity extends Activity implements CardboardView.
     /**
      * Constructor for StreamControllerActivity
      */
-    public StreamControllerActivity() {
-    }
+    public StreamControllerActivity() {}
 
     /**
      * Sets the view to our CardboardView and initializes the transformation matrices we will use
@@ -94,18 +94,17 @@ public class StreamControllerActivity extends Activity implements CardboardView.
         baseUrl += ip;
 
         CT = new ClientThread();
-
-        mOverlayView = (OverlayView) findViewById(R.id.overlay);
         CT.run();
 
+        mOverlayView = (OverlayView) findViewById(R.id.overlay);
         startPlayer();
     }
 
 
     /**
-     * Sets up the MjpegPlayer using the OverlayView object
-     * Attaches the :5000/stream/video.mjpeg in order to get stay consistent with UV4L WebRTC format
-     * Creates a ReadInputStream object which creates a thread to render the Mjpeg stream
+     * Sets up the MjpegPlayer using an OverlayView object
+     * Attaches the :5000/stream/video.mjpeg in order to stay consistent with UV4L WebRTC stream format
+     * Creates a ReadInputStream object which creates a thread in MjpegPlayer to render Mjpeg stream
      */
     private void startPlayer(){
         String URL = baseUrl + ":5000/stream/video.mjpeg";
@@ -132,10 +131,15 @@ public class StreamControllerActivity extends Activity implements CardboardView.
 
     /**
      * Checks for valid input MJpeg stream at a specified URL location, sets MjpegPlayer source if
-     * found, returns to ConnectActivity if no stream is available.
+     * found, returns to ConnectActivity GUI if no stream is available.
      */
     class ReadInputStream extends AsyncTask<String, Void, MjpegInputStream> {
 
+        /**
+         * Attempts to connect to a URL which is help in params[0] to begin a stream
+         * @param params params[0] contains the Ip address specified by the user
+         * @return the MjpegInputStream at a url or null if not valid
+         */
         @Override
         protected MjpegInputStream doInBackground(String... params) {
             return MjpegInputStream.read(params[0]);
@@ -229,9 +233,7 @@ public class StreamControllerActivity extends Activity implements CardboardView.
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
 
-                    /*
-                       Reads the current mode and only responds if it is in sport mode (mode = 1)
-                     */
+                    /* Reads the current mode and only responds if it is in sport mode (mode = 1) */
                     switch(servoMsg.getMode()){
                         case 1:
                             switch(event.getAction()) {
@@ -256,7 +258,6 @@ public class StreamControllerActivity extends Activity implements CardboardView.
                 @Override
                 public void onClick(View v) {
                     closeProgram = true;
-
                     finishActivity(0);
                     Intent ReturnToSignin = new Intent(StreamControllerActivity.this, ConnectActivity.class);
                     System.exit(0);
@@ -296,7 +297,6 @@ public class StreamControllerActivity extends Activity implements CardboardView.
                         e.printStackTrace();
                     }
                 }
-
                 /**/
                 o_x = x;
                 o_y = y;

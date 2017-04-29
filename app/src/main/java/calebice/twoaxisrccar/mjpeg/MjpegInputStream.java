@@ -12,6 +12,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Properties;
 
+/**
+ *
+ */
 public class MjpegInputStream extends DataInputStream {
     private final byte[] SOI_MARKER = { (byte) 0xFF, (byte) 0xD8 };
     private final byte[] EOF_MARKER = { (byte) 0xFF, (byte) 0xD9 };
@@ -23,7 +26,7 @@ public class MjpegInputStream extends DataInputStream {
     /**
      * attempts to connect to a URL and returns the available stream
      * @param urlString the url to connect to
-     * @return the Stream of MJpegs at a url
+     * @return a MjpegInputStream connected to URL or null
      */
     public static MjpegInputStream read(String urlString) {
         HttpURLConnection conn;
@@ -39,8 +42,19 @@ public class MjpegInputStream extends DataInputStream {
         return null;
     }
 
+    /**
+     * Called from read(String urlString) builds a MjpegInputStream using InputStream information
+     * @param in The url.openConnection(): Should be a Mjpeg format stream
+     */
     public MjpegInputStream(InputStream in) { super(new BufferedInputStream(in, FRAME_MAX_LENGTH)); }
 
+    /**
+     *
+     * @param in
+     * @param sequence
+     * @return
+     * @throws IOException
+     */
     private int getEndOfSeqeunce(DataInputStream in, byte[] sequence) throws IOException {
         int seqIndex = 0;
         byte c;
@@ -54,11 +68,25 @@ public class MjpegInputStream extends DataInputStream {
         return -1;
     }
 
+    /**
+     *
+     * @param in
+     * @param sequence
+     * @return
+     * @throws IOException
+     */
     private int getStartOfSequence(DataInputStream in, byte[] sequence) throws IOException {
         int end = getEndOfSeqeunce(in, sequence);
         return (end < 0) ? (-1) : (end - sequence.length);
     }
 
+    /**
+     *
+     * @param headerBytes
+     * @return
+     * @throws IOException
+     * @throws NumberFormatException
+     */
     private int parseContentLength(byte[] headerBytes) throws IOException, NumberFormatException {
         ByteArrayInputStream headerIn = new ByteArrayInputStream(headerBytes);
         Properties props = new Properties();
@@ -66,6 +94,11 @@ public class MjpegInputStream extends DataInputStream {
         return Integer.parseInt(props.getProperty(CONTENT_LENGTH));
     }
 
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
     public Bitmap readMjpegFrame() throws IOException {
         mark(FRAME_MAX_LENGTH);
         int headerLen = getStartOfSequence(this, SOI_MARKER);

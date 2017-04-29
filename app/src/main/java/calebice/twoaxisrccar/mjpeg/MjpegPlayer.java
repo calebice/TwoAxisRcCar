@@ -14,8 +14,10 @@ import java.io.IOException;
 
 import calebice.twoaxisrccar.GuiFunctions.OverlayView;
 
+/**
+ *
+ */
 public class MjpegPlayer implements SurfaceHolder.Callback{
-
 
     public final static int SIZE_STANDARD   = 1;
     public final static int SIZE_BEST_FIT   = 4;
@@ -27,28 +29,40 @@ public class MjpegPlayer implements SurfaceHolder.Callback{
 
     private boolean surfaceDone;
 
+    /**
+     * Checks to ensure there is a Layout that the SurfaceView is on
+     * @param holder
+     */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.i("TAG", "a surface was created!");
         surfaceDone=true;
-
     }
-
+    /*Unused methods in interface implementation*/
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-    }
-
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
+    public void surfaceDestroyed(SurfaceHolder holder) {}
+    /*Unused interface methods*/
 
-    }
-
+    /**
+     * Thread that manages and paints the MjpegInputStream onto the OverlayView's SurfaceHolder
+     * Which is displayed on the layout for StreamControllerActivity
+     * This is the framework for reading the incoming stream of Mjpegs
+     */
     public class MjpegViewThread extends Thread {
         private SurfaceView surface;
 
+        /**
+         * Instantiates the Mjpeg Thread with the passed in Overlay object for rendering
+         * @param surface the Overlay object's view for drawing in SCA
+         */
         public MjpegViewThread(SurfaceView surface) { this.surface = surface; }
 
+        /**
+         * Loops over the available MJpegs using the available stream and then draws each frame onto
+         * the surfaceHolder
+         */
         public void run() {
 
             final Paint p = new Paint();
@@ -73,6 +87,10 @@ public class MjpegPlayer implements SurfaceHolder.Callback{
         }
     }
 
+    /**
+     * Initializes the Paint object to draw onto the Thread that has the SurfaceView from OverlayView
+     * @param holder the object to draw onto (From OverlayView)
+     */
     private void init(SurfaceView holder) {
         thread = new MjpegViewThread(holder);
         overlayPaint = new Paint();
@@ -81,6 +99,10 @@ public class MjpegPlayer implements SurfaceHolder.Callback{
         overlayPaint.setTypeface(Typeface.DEFAULT);
     }
 
+    /**
+     * Called once a MjpegInputStream is established (source) begins the MjpegViewThread which loops
+     * over frames from the stream
+     */
     public void startPlayback() {
         if(mIn != null) {
             mRun = true;
@@ -88,11 +110,20 @@ public class MjpegPlayer implements SurfaceHolder.Callback{
         }
     }
 
+    /**
+     * Sets up MjpegViewThread to draw onto the OverlayView frame
+     * @param cov the Surface view to begin painting on
+     */
     public MjpegPlayer(OverlayView cov) {
         init(cov.getSurfaceView());
         cov.setCallback(this);
     }
 
+    /**
+     * Called from ReadInputStream object, establishes a connection to MjpegInputStream and then
+     * begins thread that reads the stream from source
+     * @param source the MjpegInputStream returned from the user specified IP address
+     */
     public void setSource(MjpegInputStream source) {
         mIn = source;
         startPlayback();
