@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package calebice.twoaxisrccar;
+package calebice.twoaxisrccar.GuiFunctions;
 
 import android.app.Activity;
 import android.content.Context;
@@ -44,7 +44,9 @@ import java.util.HashMap;
 
 import javax.microedition.khronos.egl.EGLConfig;
 
+import calebice.twoaxisrccar.R;
 import calebice.twoaxisrccar.Servo.messageProcessor;
+import calebice.twoaxisrccar.Client.UDP_Client;
 import calebice.twoaxisrccar.mjpeg.MjpegInputStream;
 import calebice.twoaxisrccar.mjpeg.MjpegPlayer;
 

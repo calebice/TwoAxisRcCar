@@ -1,6 +1,6 @@
 //http://stackoverflow.com/questions/34799166/android-udp-cant-send-or-recive
 
-package calebice.twoaxisrccar;
+package calebice.twoaxisrccar.Client;
 
 import android.os.AsyncTask;
 
@@ -20,7 +20,7 @@ import java.util.HashMap;
  *
  * Creates a UDP connection in order to connect to the Raspberry Pi server
  */
-class UDP_Client extends AsyncTask<HashMap, Integer, String> {
+public class UDP_Client extends AsyncTask<HashMap, Integer, String> {
     //Initialize Variables
     InetAddress IPAddress = null;
     int Port = 5432;

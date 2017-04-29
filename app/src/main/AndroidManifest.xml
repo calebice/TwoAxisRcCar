@@ -20,7 +20,7 @@
         android:hardwareAccelerated="true"
 
         <activity
-            android:name="calebice.twoaxisrccar.ConfigActivity"
+            android:name="calebice.twoaxisrccar.GuiFunctions.ConfigActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="calebice.twoaxisrccar.StreamActivity"
+            android:name="calebice.twoaxisrccar.GuiFunctions.StreamActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape">
         </activity>

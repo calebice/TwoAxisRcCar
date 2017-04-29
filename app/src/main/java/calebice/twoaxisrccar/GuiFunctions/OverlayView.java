@@ -1,4 +1,4 @@
-package calebice.twoaxisrccar;
+package calebice.twoaxisrccar.GuiFunctions;
 
 import android.content.Context;
 import android.util.AttributeSet;

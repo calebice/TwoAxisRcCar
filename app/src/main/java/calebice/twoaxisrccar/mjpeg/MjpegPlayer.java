@@ -12,7 +12,7 @@ import android.view.SurfaceView;
 
 import java.io.IOException;
 
-import calebice.twoaxisrccar.OverlayView;
+import calebice.twoaxisrccar.GuiFunctions.OverlayView;
 
 public class MjpegPlayer implements SurfaceHolder.Callback{
 
