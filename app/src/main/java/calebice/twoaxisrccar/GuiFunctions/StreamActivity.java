@@ -64,7 +64,7 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
     private String baseUrl = "http://";
     private ClientThread CT;
     private String ip="";
-    private String port="";
+    private int port= 0;
 
     public StreamActivity() {
     }
@@ -84,7 +84,7 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
 
         Intent i = getIntent();
         ip += i.getExtras().get("ip");
-        port += i.getExtras().get("port");
+        port = Integer.parseInt(i.getExtras().get("port").toString());
         baseUrl += ip;
 
         CT = new ClientThread();
@@ -134,7 +134,6 @@ public class StreamActivity extends Activity implements CardboardView.StereoRend
         protected void onPostExecute(MjpegInputStream result) {
             if (result == null){
                 Toast.makeText(me,ip+" has no valid stream",Toast.LENGTH_LONG).show();
-
                 startActivity(new Intent(me,ConfigActivity.class));
             }
             mp.setSource(result);
