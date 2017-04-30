@@ -15,12 +15,10 @@ import java.io.IOException;
 import calebice.twoaxisrccar.GuiFunctions.OverlayView;
 
 /**
- *
+ * Drawing class connected to OverlayView that paints incoming Mjpegs onto the OverlayView frame
+ * once a MjpegInputStream is validated
  */
 public class MjpegPlayer implements SurfaceHolder.Callback{
-
-    public final static int SIZE_STANDARD   = 1;
-    public final static int SIZE_BEST_FIT   = 4;
 
     private MjpegViewThread thread;
     private MjpegInputStream mIn = null;
@@ -30,14 +28,15 @@ public class MjpegPlayer implements SurfaceHolder.Callback{
     private boolean surfaceDone;
 
     /**
-     * Checks to ensure there is a Layout that the SurfaceView is on
-     * @param holder
+     * Checks to ensure there is a Layout that the SurfaceView is monitoring
+     * @param holder Created SurfaceHolder to monitor and paint onto SurfaceView
      */
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         Log.i("TAG", "a surface was created!");
         surfaceDone=true;
     }
+
     /*Unused methods in interface implementation*/
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
@@ -50,18 +49,18 @@ public class MjpegPlayer implements SurfaceHolder.Callback{
      * Which is displayed on the layout for StreamControllerActivity
      * This is the framework for reading the incoming stream of Mjpegs
      */
-    public class MjpegViewThread extends Thread {
+    private class MjpegViewThread extends Thread {
         private SurfaceView surface;
 
         /**
          * Instantiates the Mjpeg Thread with the passed in Overlay object for rendering
-         * @param surface the Overlay object's view for drawing in SCA
+         * @param surface the Overlay object's view for drawing in StreamControllerActivity
          */
-        public MjpegViewThread(SurfaceView surface) { this.surface = surface; }
+        private MjpegViewThread(SurfaceView surface) { this.surface = surface; }
 
         /**
-         * Loops over the available MJpegs using the available stream and then draws each frame onto
-         * the surfaceHolder
+         * Loops over the available MJpegs using stream and then draws each frame onto
+         * the surfaceHolder from OverlayView
          */
         public void run() {
 
@@ -72,13 +71,12 @@ public class MjpegPlayer implements SurfaceHolder.Callback{
                         final Bitmap bm = mIn.readMjpegFrame();
                         Bitmap scaled = Bitmap.createScaledBitmap(bm, surface.getWidth(), surface.getHeight(), false);
                             SurfaceHolder surfaceH = surface.getHolder();
-                            synchronized (surfaceH) {
                                 Canvas c = surfaceH.lockCanvas();
                                 c.drawColor(Color.BLACK);
+                                //Pains the full Bitmap onto a canvas
                                 c.drawBitmap(scaled, 0, 0, p);
+                                //Posts this drawn image onto the Surface
                                 surfaceH.unlockCanvasAndPost(c);
-                            }
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -103,7 +101,7 @@ public class MjpegPlayer implements SurfaceHolder.Callback{
      * Called once a MjpegInputStream is established (source) begins the MjpegViewThread which loops
      * over frames from the stream
      */
-    public void startPlayback() {
+    private void startPlayback() {
         if(mIn != null) {
             mRun = true;
             thread.start();

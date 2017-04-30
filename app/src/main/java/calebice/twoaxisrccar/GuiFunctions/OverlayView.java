@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 /**
- * Extension of LinearLayout that sets up the frame to view the incoming video
+ * Extension of LinearLayout that sets up a frame to view the incoming video from a MjpegInputStream
  */
 public class OverlayView extends LinearLayout {
     private final OverlayFrameView mView;
@@ -30,11 +30,18 @@ public class OverlayView extends LinearLayout {
 
     }
 
+    /**
+     * Basic getter function that retrieves a OverlayView's SurfaceView object
+     * @return The SurfaceView object instantiated by the the constructor
+     */
     public SurfaceView getSurfaceView(){
         return mView.getSurfaceView();
-
     }
 
+    /**
+     * Creates a interface to gather information about the changes on the SurfaceView
+     * @param cb The object to read information from
+     */
     public void setCallback(SurfaceHolder.Callback cb){
         mView.imageView.getHolder().addCallback(cb);
     }
@@ -47,19 +54,27 @@ public class OverlayView extends LinearLayout {
         private final SurfaceView imageView;
 
         /**
-         * Constructor that
-         * @param context
-         * @param attrs
+         * Creates an instance of OverlayFrameView that adds a SurfaceView to the basic ViewGroup
+         * @param context The current activity GUI that is active
+         * @param attrs XML references for size and orientation
          */
         public OverlayFrameView(Context context, AttributeSet attrs) {
             super(context, attrs);
             imageView = new SurfaceView(context, attrs);
             addView(imageView);
-
         }
 
+        /**
+         * Sets up an instance of the ViewGroup frame using information from device
+         * @param changed indicates if location has changed
+         * @param left leftmost position based on parent
+         * @param top top position relative to parent
+         * @param right right position relative to parent
+         * @param bottom bottom position relative to parent
+         */
         @Override
         protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+
             // Width and height of this ViewGroup.
             final int width = right - left;
             final int height = bottom - top;
@@ -69,22 +84,20 @@ public class OverlayView extends LinearLayout {
             // box, the image is the horizontally and vertically centered.
             final float imageSize = 1.0f;
 
-            // The fraction of this ViewGroup's height by which we shift the image off the ViewGroup's
-            // center. Positive values shift downwards, negative values shift upwards.
-            final float verticalImageOffset = -0.07f;
-
             // Layout ImageView
             float imageMargin = (1.0f - imageSize) / 2.0f;
             float leftMargin = (int) (width * (imageMargin));
-            float topMargin = (int) (height * (imageMargin + verticalImageOffset));
+            float topMargin = (int) (height * (imageMargin ));
             imageView.layout(
                     (int) leftMargin, (int) topMargin,
                     (int) (leftMargin + width * imageSize), (int) (topMargin + height * imageSize));
             imageView.setZOrderMediaOverlay(true);
         }
 
-        public SurfaceView getSurfaceView(){
-            return imageView;
-        }
+        /**
+         * Standard getter for the SurfaceView object in OverlayFrameView
+         * @return the SurfaceView
+         */
+        public SurfaceView getSurfaceView(){return imageView;}
     }
 }

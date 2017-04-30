@@ -1,20 +1,4 @@
-/*
- * Copyright 2014 Google Inc. All Rights Reserved.
-
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/** Authors: Caleb Ice, Jesse Reyes, Justin Janker*/
+/* Authors: Caleb Ice, Jesse Reyes, Justin Janker*/
 
 package calebice.twoaxisrccar.GuiFunctions;
 
@@ -27,7 +11,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -36,19 +19,12 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.vrtoolkit.cardboard.CardboardView;
-import com.google.vrtoolkit.cardboard.EyeTransform;
-import com.google.vrtoolkit.cardboard.HeadTransform;
-import com.google.vrtoolkit.cardboard.Viewport;
-
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.microedition.khronos.egl.EGLConfig;
-
+import calebice.twoaxisrccar.Client.UDP_Client;
 import calebice.twoaxisrccar.R;
 import calebice.twoaxisrccar.Servo.messageProcessor;
-import calebice.twoaxisrccar.Client.UDP_Client;
 import calebice.twoaxisrccar.mjpeg.MjpegInputStream;
 import calebice.twoaxisrccar.mjpeg.MjpegPlayer;
 
@@ -57,7 +33,8 @@ import calebice.twoaxisrccar.mjpeg.MjpegPlayer;
  * Builds on top of a CardboardView Renderer to process images, as well as creates
  * a ClientThread to send messages to a Raspberry Pi Server
  */
-public class StreamControllerActivity extends Activity implements CardboardView.StereoRenderer {
+public class StreamControllerActivity extends Activity //implements CardboardView.StereoRenderer
+{
 
     private static final String TAG = "StreamControllerActivity";
 
@@ -77,15 +54,13 @@ public class StreamControllerActivity extends Activity implements CardboardView.
     /**
      * Sets the view to our CardboardView and initializes the transformation matrices we will use
      * to render our scene.
-     * @param savedInstanceState
+     * @param savedInstanceState the information from the Instance
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.common_ui);
-        CardboardView cardboardView = (CardboardView) findViewById(R.id.cardboard_view);
-        cardboardView.setRenderer(this);
 
         Intent i = getIntent();
         /*Sets Ip and port number to connect to Video stream/Raspberry Pi Server*/
@@ -112,28 +87,11 @@ public class StreamControllerActivity extends Activity implements CardboardView.
         (new ReadInputStream()).execute(URL);
     }
 
-    /*Required methods in order to use the Google API renderer
-    None of these are required for video streaming, required implementations of abstracts
-    Used for implementing CardboardView.StereoRenderer*/
-    @Override
-    public void onRendererShutdown(){Log.i(TAG, "onRendererShutdown");}
-    @Override
-    public void onSurfaceChanged(int width, int height) {Log.i(TAG, "onSurfaceChanged");}
-    @Override
-    public void onSurfaceCreated(EGLConfig config) {Log.i(TAG, "onSurfaceCreated");}
-    @Override
-    public void onNewFrame(HeadTransform headTransform) {}
-    @Override
-    public void onDrawEye(EyeTransform transform) {}
-    @Override
-    public void onFinishFrame(Viewport viewport) {}
-    /*End non-used method implementations*/
-
     /**
      * Checks for valid input MJpeg stream at a specified URL location, sets MjpegPlayer source if
      * found, returns to ConnectActivity GUI if no stream is available.
      */
-    class ReadInputStream extends AsyncTask<String, Void, MjpegInputStream> {
+    private class ReadInputStream extends AsyncTask<String, Void, MjpegInputStream> {
 
         /**
          * Attempts to connect to a URL which is help in params[0] to begin a stream
@@ -173,7 +131,7 @@ public class StreamControllerActivity extends Activity implements CardboardView.
         /**
          * Sets up the textfields, the sensor listener, quit button and the modeSwitch
          */
-        public void run() {
+        private void run() {
 
             final Intent i = getIntent();
             //TextView Setup for X, Y, Z
