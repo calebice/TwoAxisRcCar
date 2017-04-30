@@ -52,6 +52,7 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
     private float mags[] = new float[3];
     private float gyroValues[] = new float[3];
     private int gyroZ, o_gyroZ, delta_gyroZ;
+    private float[] outGravity;
 
     /**
      * Constructor for StreamControllerActivity
@@ -256,48 +257,42 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
          */
         @Override
         public void onSensorChanged(SensorEvent event) {
-            //get accelerometer values;
-            x = -1*((int) event.values[1]) + 9;
-            y = (int) event.values[1] + 9;
             //z = (int) event.values[2] + 9;
-
+            outGravity = new float[9];
             gravity = new float[9];
             magnetic = new float[9];
+
+            //Get's values from switching sensors (Accelerometer & Gyroscope
             switch(event.sensor.getType()) {
                 case Sensor.TYPE_GAME_ROTATION_VECTOR:
                     mags = event.values.clone();
+                    gyroZ = -(int) Math.toDegrees(gyroValues[0])*2;
+                    z = (z + (gyroZ - o_gyroZ));
+                    o_gyroZ = gyroZ;
+                    if((z/10) > 18) {
+                        z = 180;
+                    }
+                    if(z < 0) {
+                        z = 0;
+                    }
                     break;
                 case Sensor.TYPE_ACCELEROMETER:
                     accels = event.values.clone();
+                    //get accelerometer values;
+                    x = (int) event.values[2] + 9;
+                    y = (int) event.values[1] + 9;
                     break;
             }
-
             SensorManager.getRotationMatrix(gravity, magnetic, accels, mags);
-            float[] outGravity = new float[9];
             SensorManager.remapCoordinateSystem(gravity, SensorManager.AXIS_X, SensorManager.AXIS_Z, outGravity);
+
             //Computes the device's orientation based on the rotation matrix
             //values[0]: Azimuth, angle of rotation about the z-axis
             //values[1]: Pitch, angle of rotation about the x-axis
             //values[2]: Roll, angle of rotation about the y-axis
             SensorManager.getOrientation(outGravity, gyroValues);
-            gyroZ = -(int) Math.toDegrees(gyroValues[0])*2;
-            z = (z + (gyroZ - o_gyroZ));
-            /**
-             *
-             */
-             if((z/10) > 18) {
-                 z = 180;
-             }
-             if(z < 0) {
-                 z = 0;
-             }
-
-
-            o_gyroZ = gyroZ;
-
 
             servoMsg.setFormatMessage(x,y,(z/10),d);
-
 
             //if old_val != new_val send message to RPI3
             if (x != o_x ||y != o_y || z != o_z) {
