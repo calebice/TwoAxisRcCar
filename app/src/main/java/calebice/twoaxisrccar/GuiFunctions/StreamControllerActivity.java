@@ -11,6 +11,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import calebice.twoaxisrccar.Client.UDP_Client;
 import calebice.twoaxisrccar.R;
 import calebice.twoaxisrccar.Servo.messageProcessor;
+import calebice.twoaxisrccar.Client.UDP_Client;
 import calebice.twoaxisrccar.mjpeg.MjpegInputStream;
 import calebice.twoaxisrccar.mjpeg.MjpegPlayer;
 
@@ -45,6 +47,11 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
     private ClientThread CT;
     private String ip="";
     private int port= 0;
+    private float gravity[], magnetic[];
+    private float accels[] = new float[3];
+    private float mags[] = new float[3];
+    private float gyroValues[] = new float[3];
+    private int gyroZ, o_gyroZ, delta_gyroZ;
 
     /**
      * Constructor for StreamControllerActivity
@@ -119,14 +126,15 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
     private class ClientThread implements SensorEventListener {
         boolean closeProgram = false;
         messageProcessor servoMsg = new messageProcessor();
-        Sensor accelerometer;
+        Sensor accelerometer, geoMagnetic;
         SensorManager sm;
         TextView text_x;
         TextView text_y;
         TextView text_z;
         TextView text_drive;
-        int x, y, z, o_x, o_y, o_z;
-        int d;
+        int x, y, o_x, o_y, o_z;
+        int z = 9;
+        int d; //drive integer value
 
         /**
          * Sets up the textfields, the sensor listener, quit button and the modeSwitch
@@ -143,7 +151,9 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
             //Accelerometer Setup
             sm = (SensorManager) getSystemService(SENSOR_SERVICE);
             accelerometer = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            geoMagnetic = sm.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
             sm.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+            sm.registerListener(this, geoMagnetic, SensorManager.SENSOR_DELAY_NORMAL);
 
             final Switch modeSwitch = (Switch)findViewById(R.id.modeSwitch);
             modeSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
@@ -216,10 +226,19 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
                 @Override
                 public void onClick(View v) {
                     closeProgram = true;
+
                     finishActivity(0);
                     Intent ReturnToSignin = new Intent(StreamControllerActivity.this, ConnectActivity.class);
                     System.exit(0);
                     startActivity(ReturnToSignin);
+                }
+            });
+
+            final Button centerButton = (Button)findViewById(R.id.centerButtonID);
+            centerButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    z = 90;
                 }
             });
         }
@@ -237,10 +256,48 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
          */
         @Override
         public void onSensorChanged(SensorEvent event) {
+            //get accelerometer values;
             x = -1*((int) event.values[1]) + 9;
             y = (int) event.values[1] + 9;
-            z = (int) event.values[2] + 9;
-            servoMsg.setFormatMessage(x,y,z,d);
+            //z = (int) event.values[2] + 9;
+
+            gravity = new float[9];
+            magnetic = new float[9];
+            switch(event.sensor.getType()) {
+                case Sensor.TYPE_GAME_ROTATION_VECTOR:
+                    mags = event.values.clone();
+                    break;
+                case Sensor.TYPE_ACCELEROMETER:
+                    accels = event.values.clone();
+                    break;
+            }
+
+            SensorManager.getRotationMatrix(gravity, magnetic, accels, mags);
+            float[] outGravity = new float[9];
+            SensorManager.remapCoordinateSystem(gravity, SensorManager.AXIS_X, SensorManager.AXIS_Z, outGravity);
+            //Computes the device's orientation based on the rotation matrix
+            //values[0]: Azimuth, angle of rotation about the z-axis
+            //values[1]: Pitch, angle of rotation about the x-axis
+            //values[2]: Roll, angle of rotation about the y-axis
+            SensorManager.getOrientation(outGravity, gyroValues);
+            gyroZ = -(int) Math.toDegrees(gyroValues[0])*2;
+            z = (z + (gyroZ - o_gyroZ));
+            /**
+             *
+             */
+             if((z/10) > 18) {
+                 z = 180;
+             }
+             if(z < 0) {
+                 z = 0;
+             }
+
+
+            o_gyroZ = gyroZ;
+
+
+            servoMsg.setFormatMessage(x,y,(z/10),d);
+
 
             //if old_val != new_val send message to RPI3
             if (x != o_x ||y != o_y || z != o_z) {
@@ -255,13 +312,14 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
                         e.printStackTrace();
                     }
                 }
+
                 /**/
                 o_x = x;
                 o_y = y;
-                o_z = z;
-                text_x.setText("X: " + x);
-                text_y.setText("Y: " + y);
-                text_z.setText("Z: " + z);
+                //o_z = z;
+                text_x.setText("Accel-X: " + x);
+                text_y.setText("Accel-Y: " + y);
+                text_z.setText("Gyro-Z: " + z/10);
             }
         }
     }

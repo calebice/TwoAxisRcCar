@@ -62,6 +62,13 @@
             android:id="@+id/textView_d"
             android:layout_weight="1"/>
 
+        <Button
+            android:id="@+id/centerButtonID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Center" />
+
     </LinearLayout>
 
     <RelativeLayout
