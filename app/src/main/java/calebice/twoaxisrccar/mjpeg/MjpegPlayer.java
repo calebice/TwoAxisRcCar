@@ -1,3 +1,4 @@
+/*Acknowledgement to nichhk for reworking SimpleMjpeg Frame to be divided into classes more efficiently*/
 
 package calebice.twoaxisrccar.mjpeg;
 
