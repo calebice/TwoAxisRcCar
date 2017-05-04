@@ -4,9 +4,7 @@ package calebice.twoaxisrccar.Client;
 
 import android.os.AsyncTask;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -17,27 +15,15 @@ import java.util.HashMap;
 /**
  * Created by reyes on 3/27/2017.
  *
- *
  * Creates a UDP connection in order to connect to the Raspberry Pi server
  */
 public class UDP_Client extends AsyncTask<HashMap, Integer, String> {
-    //Initialize Variables
-    InetAddress IPAddress = null;
-    int Port = 5432;
-    DatagramSocket clientSocket;
-    DatagramPacket sendPacket;
-    byte[] sendData, receiveData;
 
-    //Constructors
+    /**
+     * Creates an instance of UDP_Client that
+     * @throws IOException if there is an invalid source
+     */
     public UDP_Client() throws IOException {    }
-    public UDP_Client(String ipaddress, int port) throws IOException {
-        IPAddress = InetAddress.getByName(ipaddress);
-        Port = port;
-        BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-        //clientSocket = new DatagramSocket();
-        receiveData = new byte[1024];
-
-    }
 
     /**
      * Required method for AsyncTask, checks to see if there is a server available, and sends
@@ -66,7 +52,6 @@ public class UDP_Client extends AsyncTask<HashMap, Integer, String> {
         }
 
         dp = new DatagramPacket(udpMsg.getBytes(), udpMsg.length(), serverAddr, port);
-
         try {
             ds.send(dp);
         } catch (IOException e) {

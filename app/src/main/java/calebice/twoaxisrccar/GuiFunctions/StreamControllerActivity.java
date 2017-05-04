@@ -66,6 +66,9 @@ public class StreamControllerActivity extends Activity //implements CardboardVie
         /*Sets Ip and port number to connect to Video stream/Raspberry Pi Server*/
         ip += i.getExtras().get("ip");
         port = Integer.parseInt(i.getExtras().get("port").toString());
+
+
+
         baseUrl += ip;
 
         CT = new ClientThread();
